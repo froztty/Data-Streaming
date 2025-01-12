@@ -54,14 +54,6 @@ This will start the following services:
 - **Control Center**: Provides a UI to monitor Kafka and topics.
 - **Apache Airflow Webserver**: Used to trigger DAGs as admin
 
-### 3. Activate the virtual environment
-
-I recommend using venv1 as it has jar files which are needed to run the streaming script.
-
-```bash
-source ./.venv1/bin/activate
-```
-
 ### 3. Install Python Dependencies
 
 You can install the required Python dependencies by running:
