@@ -6,7 +6,7 @@ services:
       hostname: zookeeper
       container_name: zookeeper
       ports:
-        - "2181:2181"
+        - "2181:2181" # client connections
       environment:
         ZOOKEEPER_CLIENT_PORT: 2181
         ZOOKEEPER_TICK_TIME: 2000
@@ -17,6 +17,8 @@ services:
         retries: 5
       networks:
         - confluent
+
+  # Handle data publishing and storing
   broker:
     image: confluentinc/cp-server:7.4.0
     hostname: broker
@@ -25,7 +27,7 @@ services:
       zookeeper:
         condition: service_healthy
     ports:
-      - "9092:9092"
+      - "9092:9092" # Kafka client port for communication with producers and consumers
       - "9101:9101"
     environment:
       KAFKA_BROKER_ID: 1
@@ -65,7 +67,7 @@ services:
       - "8081:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092' # connect to kafka broker
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
     networks:
       - confluent
@@ -75,6 +77,7 @@ services:
       timeout: 10s
       retries: 5
 
+# service configuration which is Kafka monitoring tool (manage kafka cluster and topics)
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.4.0
     hostname: control-center
@@ -150,6 +153,7 @@ services:
     networks:
       - confluent
 
+# PostgreSQL for Airflow backend (not needed later)
   postgres:
     image: postgres:14.0
     environment:
@@ -160,6 +164,40 @@ services:
       options:
         max-size: 10m
         max-file: "3"
+    networks:
+      - confluent
+
+  spark-master:
+    image: bitnami/spark:latest
+    command: bin/spark-class org.apache.spark.deploy.master.Master
+    ports:
+      - "9090:8080" # 9090 to access UI
+      - "7077:7077" # master communicates with worker(s)
+    networks:
+      - confluent
+  spark-worker:
+    image: bitnami/spark:latest
+    command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MODE: worker
+      SPARK_WORKER_MEMORY: 1g
+      SPARK_MASTER_URL: spark://spark-master:7077
+    networks:
+      - confluent
+
+  cassandra_db:
+    image: cassandra:latest
+    container_name: cassandra
+    hostname: cassandra_db
+    ports:
+      - "9042:9042"
+    environment:
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=100M
+      - CASSANDRA_USERNAME=cassandra
+      - CASSANDRA_PASSWORD=cassandra
     networks:
       - confluent
 
