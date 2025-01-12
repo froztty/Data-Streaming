@@ -19,7 +19,6 @@ Technology used: **Apach Airflow**, **PostgreSQL** **Kafka**, **Apache Spark**, 
 Make sure you have the following installed:
 
 - **Docker**: For creating and running the containerized services (Kafka, Spark, Cassandra).
-- **Docker Compose**: For managing multi-container Docker applications.
 - **Python 3.11**: For running the Spark streaming script (`spark_streaming.py`).
 
 ---
