@@ -63,7 +63,8 @@ pip install -r requirements.txt
 
 ### 4. Run the Streaming Script
 
-The core functionality is implemented in the `spark_streaming.py` script. You can run the script to start streaming and processing the data.
+You can run the script to start streaming and processing the data. 
+There may be some .jar files needed to connect with Spark to Kafka and Cassandra.
 
 ```bash
 python spark_streaming.py
@@ -73,7 +74,6 @@ python spark_streaming.py
 
 After running the script, you can connect to Cassandra and check that the data has been inserted into the `created_users` table.
 
-You can use the following CQL command to check the data:
 
 ```bash
 docker exec -it cassandra cqlsh
@@ -94,3 +94,4 @@ SELECT * FROM created_users;
 - Integrate with other data storage systems like relational databases (also switching between NoSQL databases like MongoDB).
 - Set up monitoring and alerting for Kafka, Spark, and Cassandra.
 - Add different types of data from other APIs (creating possibly unstructured data without schemas)
+- Implement a way to showcase the data in Cassandra
